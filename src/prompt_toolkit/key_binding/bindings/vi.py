@@ -71,7 +71,6 @@ class TextObject:
     def __init__(
         self, start: int, end: int = 0, type: TextObjectType = TextObjectType.EXCLUSIVE
     ):
-
         self.start = start
         self.end = end
         self.type = type
@@ -1861,7 +1860,7 @@ def load_vi_bindings() -> KeyBindingsBase:
         )
         def _arg(event: E) -> None:
             """
-            Always handle numberics in navigation mode as arg.
+            Always handle numerics in navigation mode as arg.
             """
             event.append_to_arg_count(event.data)
 

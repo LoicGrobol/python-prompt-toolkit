@@ -1,6 +1,104 @@
 CHANGELOG
 =========
 
+3.0.36: 2022-12-06
+------------------
+
+Fixes:
+- Another Python 3.6 fix for a bug that was introduced in 3.0.34.
+
+
+3.0.35: 2022-12-06
+------------------
+
+Fixes:
+- Fix bug introduced in 3.0.34 for Python 3.6. Use asynccontextmanager
+  implementation from prompt_toolkit itself.
+
+
+3.0.34: 2022-12-06
+------------------
+
+Fixes:
+- Improve completion performance in various places.
+- Improve renderer performance.
+- Handle `KeyboardInterrupt` when the stacktrace of an unhandled error is
+  displayed.
+- Use correct event loop in `Application.create_background_task()`.
+- Fix `show_cursor` attribute in `ScrollablePane`.
+
+
+3.0.33: 2022-11-21
+------------------
+
+Fixes:
+- Improve termination of `Application`. Don't suppress `CancelledError`. This
+  fixes a race condition when an `Application` gets cancelled while we're
+  waiting for the background tasks to complete.
+- Fixed typehint for `OneStyleAndTextTuple`.
+- Small bugfix in `CombinedRegistry`. Fixed missing `@property`.
+
+
+3.0.32: 2022-11-03
+------------------
+
+Bug fixes:
+- Use `DummyInput` by default in `create_input()` if `sys.stdin` does not have
+  a valid file descriptor. This fixes errors when `sys.stdin` is patched in
+  certain situations.
+- Fix control-c key binding for `ProgressBar` when the progress bar was not
+  created from the main thread. The current code would try to kill the main
+  thread when control-c was pressed.
+
+New features:
+- Accept a `cancel_callback` in `ProgressBar` to specify the cancellation
+  behavior for when `control-c` is pressed.
+- Small performance improvement in the renderer.
+
+
+3.0.31: 2022-09-02
+------------------
+
+New features:
+- Pass through `name` property in `TextArea` widget to `Buffer`.
+- Added a `enable_cpr` parameter to `Vt100_Output`, `TelnetServer` and
+  `PromptToolkitSSHServer`, to completely disable CPR support instead of
+  automatically detecting it.
+
+
+3.0.30: 2022-06-27
+------------------
+
+New features:
+- Allow zero-width-escape sequences in `print_formatted_text`.
+- Add default value option for input dialog.
+- Added `has_suggestion` filter.
+
+Fixes:
+- Fix rendering of control-shift-6 (or control-^). Render as '^^'
+- Always wrap lines in the Label widget by default.
+- Fix enter key binding in system toolbar in Vi mode.
+- Improved handling of stdout objects that don't have a 'buffer' attribute. For
+  instance, when using `renderer_print_formatted_text` in a Jupyter Notebook.
+
+
+3.0.29: 2022-04-04
+------------------
+
+New features:
+- Accept 'handle_sigint' parameter in PromptSession.
+
+Fixes
+- Fix 'variable referenced before assignment' error in vt100 mouse bindings.
+- Pass `handle_sigint` from `Application.run` to `Application.run_async`.
+- Fix detection of telnet client side changes.
+- Fix `print_container` utility (handle `EOFError`).
+
+Breaking changes:
+- The following are now context managers:
+  `create_pipe_input`, `PosixPipeInput` and `Win32PipeInput`.
+
+
 3.0.28: 2022-02-11
 ------------------
 

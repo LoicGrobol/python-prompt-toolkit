@@ -61,6 +61,7 @@ class Char:
         "\x1b": "^[",  # Escape
         "\x1c": "^\\",
         "\x1d": "^]",
+        "\x1e": "^^",
         "\x1f": "^_",
         "\x7f": "^?",  # ASCII Delete (backspace).
         # Special characters. All visualized like Vim does.
@@ -155,7 +156,6 @@ class Screen:
         initial_width: int = 0,
         initial_height: int = 0,
     ) -> None:
-
         if default_char is None:
             default_char2 = _CHAR_CACHE[" ", Transparent]
         else:
@@ -271,7 +271,7 @@ class Screen:
 
         for y, row in b.items():
             for x, char in row.items():
-                b[y][x] = char_cache[char.char, char.style + append_style]
+                row[x] = char_cache[char.char, char.style + append_style]
 
     def fill_area(
         self, write_position: "WritePosition", style: str = "", after: bool = False

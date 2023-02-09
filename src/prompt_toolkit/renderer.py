@@ -152,13 +152,12 @@ def _output_screen_diff(
         - The `Window` adds a style class to the current line for highlighting
           (cursor-line).
         """
-        numbers = [
+        numbers = (
             index
             for index, cell in row.items()
             if cell.char != " " or style_string_has_style[cell.style]
-        ]
-        numbers.append(0)
-        return max(numbers)
+        )
+        return max(numbers, default=0)
 
     # Render for the first time: reset styling.
     if not previous_screen:
@@ -189,7 +188,6 @@ def _output_screen_diff(
 
     # Loop over the rows.
     row_count = min(max(screen.height, previous_screen.height), height)
-    c = 0  # Column counter.
 
     for y in range(row_count):
         new_row = screen.data_buffer[y]
@@ -200,7 +198,7 @@ def _output_screen_diff(
         previous_max_line_len = min(width - 1, get_max_column_index(previous_row))
 
         # Loop over the columns.
-        c = 0
+        c = 0  # Column counter.
         while c <= new_max_line_len:
             new_char = new_row[c]
             old_char = previous_row[c]
@@ -277,7 +275,6 @@ class _StyleStringToAttrsCache(Dict[str, Attrs]):
         get_attrs_for_style_str: Callable[["str"], Attrs],
         style_transformation: StyleTransformation,
     ) -> None:
-
         self.get_attrs_for_style_str = get_attrs_for_style_str
         self.style_transformation = style_transformation
 
@@ -346,7 +343,6 @@ class Renderer:
         mouse_support: FilterOrBool = False,
         cpr_not_supported_callback: Optional[Callable[[], None]] = None,
     ) -> None:
-
         self.style = style
         self.output = output
         self.full_screen = full_screen
@@ -375,7 +371,6 @@ class Renderer:
         self.reset(_scroll=True)
 
     def reset(self, _scroll: bool = False, leave_alternate_screen: bool = True) -> None:
-
         # Reset position
         self._cursor_pos = Point(x=0, y=0)
 
@@ -799,12 +794,16 @@ def print_formatted_text(
                 output.reset_attributes()
         last_attrs = attrs
 
-        # Eliminate carriage returns
-        text = text.replace("\r", "")
-
-        # Assume that the output is raw, and insert a carriage return before
-        # every newline. (Also important when the front-end is a telnet client.)
-        output.write(text.replace("\n", "\r\n"))
+        # Print escape sequences as raw output
+        if "[ZeroWidthEscape]" in style_str:
+            output.write_raw(text)
+        else:
+            # Eliminate carriage returns
+            text = text.replace("\r", "")
+            # Insert a carriage return before every newline (important when the
+            # front-end is a telnet client).
+            text = text.replace("\n", "\r\n")
+            output.write(text)
 
     # Reset again.
     output.reset_attributes()

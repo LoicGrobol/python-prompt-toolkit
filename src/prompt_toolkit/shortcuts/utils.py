@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, Optional, TextIO
 from prompt_toolkit.application import Application
 from prompt_toolkit.application.current import get_app_or_none, get_app_session
 from prompt_toolkit.application.run_in_terminal import run_in_terminal
-from prompt_toolkit.eventloop import get_event_loop
 from prompt_toolkit.formatted_text import (
     FormattedText,
     StyleAndTextTuples,
@@ -183,20 +182,19 @@ def print_container(
     else:
         output = get_app_session().output
 
-    def exit_immediately() -> None:
-        # Use `call_from_executor` to exit "soon", so that we still render one
-        # initial time, before exiting the application.
-        get_event_loop().call_soon(lambda: app.exit())
-
     app: Application[None] = Application(
         layout=Layout(container=container),
         output=output,
+        # `DummyInput` will cause the application to terminate immediately.
         input=DummyInput(),
         style=_create_merged_style(
             style, include_default_pygments_style=include_default_pygments_style
         ),
     )
-    app.run(pre_run=exit_immediately, in_thread=True)
+    try:
+        app.run(in_thread=True)
+    except EOFError:
+        pass
 
 
 def _create_merged_style(

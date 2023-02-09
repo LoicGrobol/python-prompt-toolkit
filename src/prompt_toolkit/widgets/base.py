@@ -195,8 +195,8 @@ class TextArea:
         preview_search: FilterOrBool = True,
         prompt: AnyFormattedText = "",
         input_processors: Optional[List[Processor]] = None,
+        name: str = "",
     ) -> None:
-
         if search_field is None:
             search_control = None
         elif isinstance(search_field, SearchToolbar):
@@ -226,6 +226,7 @@ class TextArea:
             auto_suggest=DynamicAutoSuggest(lambda: self.auto_suggest),
             accept_handler=accept_handler,
             history=history,
+            name=name,
         )
 
         self.control = BufferControl(
@@ -344,8 +345,10 @@ class Label:
         dont_extend_height: bool = True,
         dont_extend_width: bool = False,
         align: Union[WindowAlign, Callable[[], WindowAlign]] = WindowAlign.LEFT,
+        # There is no cursor navigation in a label, so it makes sense to always
+        # wrap lines by default.
+        wrap_lines: FilterOrBool = True,
     ) -> None:
-
         self.text = text
 
         def get_width() -> AnyDimension:
@@ -370,6 +373,7 @@ class Label:
             dont_extend_height=dont_extend_height,
             dont_extend_width=dont_extend_width,
             align=align,
+            wrap_lines=wrap_lines,
         )
 
     def __pt_container__(self) -> Container:
@@ -395,7 +399,6 @@ class Button:
         left_symbol: str = "<",
         right_symbol: str = ">",
     ) -> None:
-
         self.text = text
         self.left_symbol = left_symbol
         self.right_symbol = right_symbol
@@ -487,7 +490,6 @@ class Frame:
         key_bindings: Optional[KeyBindings] = None,
         modal: bool = False,
     ) -> None:
-
         self.title = title
         self.body = body
 
@@ -631,7 +633,6 @@ class Box:
         modal: bool = False,
         key_bindings: Optional[KeyBindings] = None,
     ) -> None:
-
         if padding is None:
             padding = D(preferred=0)
 
@@ -888,7 +889,7 @@ class Checkbox(CheckboxList[str]):
 
     def __init__(self, text: AnyFormattedText = "", checked: bool = False) -> None:
         values = [("value", text)]
-        CheckboxList.__init__(self, values=values)
+        super().__init__(values=values)
         self.checked = checked
 
     @property

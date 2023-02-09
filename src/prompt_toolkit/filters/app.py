@@ -20,6 +20,7 @@ __all__ = [
     "has_focus",
     "buffer_has_focus",
     "has_selection",
+    "has_suggestion",
     "has_validation_error",
     "is_done",
     "is_read_only",
@@ -46,7 +47,11 @@ __all__ = [
 ]
 
 
-@memoized()
+# NOTE: `has_focus` below should *not* be `memoized`. It can reference any user
+#       control. For instance, if we would contiously create new
+#       `PromptSession` instances, then previous instances won't be released,
+#       because this memoize (which caches results in the global scope) will
+#       still refer to each instance.
 def has_focus(value: "FocusableElement") -> Condition:
     """
     Enable when this buffer has the focus.
@@ -112,6 +117,15 @@ def has_selection() -> bool:
     Enable when the current buffer has a selection.
     """
     return bool(get_app().current_buffer.selection_state)
+
+
+@Condition
+def has_suggestion() -> bool:
+    """
+    Enable when the current buffer has a suggestion.
+    """
+    buffer = get_app().current_buffer
+    return buffer.suggestion is not None and buffer.suggestion.text != ""
 
 
 @Condition
